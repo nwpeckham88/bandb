@@ -169,7 +169,7 @@ export default function GameBoard({
       )}
 
       {/* Main Hand & Card Inspector Section */}
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 240px', gap: '0.75rem', minHeight: 0 }}>
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 220px', gap: '0.75rem', minHeight: 0 }}>
         
         {/* Left: Defender Procedure Hand */}
         <div className="cyber-card cyber-card-overflow" style={{ padding: '0.75rem 1rem', display: 'flex', flexDirection: 'column', minHeight: 0, zIndex: 'var(--z-base, 1)' }}>
@@ -240,14 +240,20 @@ export default function GameBoard({
           </div>
 
           {/* Cards Grid */}
-          <div style={{
-            flex: 1,
-            overflowY: 'auto',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(175px, 1fr))',
-            gap: '0.75rem',
-            padding: '0.5rem 0.35rem 0.65rem 0.25rem'
-          }}>
+          <div
+            className={filteredHand.length === 5 ? 'cyber-hand-grid-5' : ''}
+            style={{
+              flex: 1,
+              overflowY: 'auto',
+              display: 'grid',
+              gridTemplateColumns: filteredHand.length === 5
+                ? undefined
+                : 'repeat(auto-fit, minmax(170px, 1fr))',
+              gap: '0.75rem',
+              padding: '0.5rem 0.35rem 0.65rem 0.25rem',
+              alignItems: 'stretch'
+            }}
+          >
             {filteredHand.map((card) => (
               <CardItem
                 key={card.id}

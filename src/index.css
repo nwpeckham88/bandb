@@ -213,6 +213,20 @@ body {
   font-weight: 700;
 }
 
+/* Procedure Hand 5-Column Dynamic Grid */
+.cyber-hand-grid-5 {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+@media (max-width: 1180px) {
+  .cyber-hand-grid-5 {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
 /* Animations */
 @keyframes pulseGlow {
   0%, 100% {
