@@ -129,7 +129,13 @@ export default function StartSplash({
             <Cpu size={18} color={connectionStatus.connected ? 'var(--neon-green)' : 'var(--neon-red)'} />
             <div style={{ textAlign: 'left' }}>
               <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>
-                AI PROVIDER: {config.provider === 'ollama' ? 'LOCAL OLLAMA' : 'OPENAI API'}
+                AI PROVIDER: {config.provider === 'ollama'
+                  ? 'LOCAL OLLAMA'
+                  : (config.openaiUrl || '').includes('groq')
+                  ? 'GROQ API'
+                  : (config.openaiUrl || '').includes('openrouter')
+                  ? 'OPENROUTER API'
+                  : 'OPENAI API'}
               </div>
               <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>
                 Model: {config.provider === 'ollama' ? config.ollamaModel : config.openaiModel}

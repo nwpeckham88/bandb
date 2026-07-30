@@ -3,19 +3,13 @@ import {
   HelpCircle,
   X,
   CheckCircle2,
-  Target,
   Shield,
   Dices,
   Zap,
   Terminal,
-  Award,
   BookOpen,
-  Sparkles,
   Layers,
-  FileText,
-  AlertTriangle,
-  Users,
-  Swords
+  Users
 } from 'lucide-react';
 
 export default function RulesModal({ isOpen, onClose }) {
@@ -347,21 +341,21 @@ export default function RulesModal({ isOpen, onClose }) {
                 </div>
 
                 <div style={{ background: 'rgba(59, 130, 246, 0.08)', border: '1px solid #3b82f6', borderRadius: '8px', padding: '0.75rem' }}>
-                  <div style={{ fontWeight: 700, color: '#3b82f6', marginBottom: '0.25rem' }}>🔵 C2 & Exfil (Blue/Brown Attack Card)</div>
+                  <div style={{ fontWeight: 700, color: '#3b82f6', marginBottom: '0.25rem' }}>🔵 C2 & Exfil (Blue Attack Card)</div>
                   <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
                     How attackers communicate with command servers or exfiltrate stolen data.
                   </div>
                 </div>
 
                 <div style={{ background: 'rgba(0, 255, 136, 0.08)', border: '1px solid var(--neon-green)', borderRadius: '8px', padding: '0.75rem' }}>
-                  <div style={{ fontWeight: 700, color: 'var(--neon-green)', marginBottom: '0.25rem' }}>🟢 Procedures (Blue/Green Defender Cards)</div>
+                  <div style={{ fontWeight: 700, color: 'var(--neon-green)', marginBottom: '0.25rem' }}>🟢 Procedures (Green Defender Cards)</div>
                   <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
                     Defender tools (e.g. Endpoint Analysis, Log Review). Defenders hold <strong>5 cards in hand</strong>. Playing a matching established procedure grants a <strong>+3 bonus</strong> to the roll!
                   </div>
                 </div>
 
                 <div style={{ background: 'rgba(234, 179, 8, 0.08)', border: '1px solid #eab308', borderRadius: '8px', padding: '0.75rem' }}>
-                  <div style={{ fontWeight: 700, color: '#eab308', marginBottom: '0.25rem' }}>⚡ Injects (White/Yellow Chaos Cards)</div>
+                  <div style={{ fontWeight: 700, color: '#eab308', marginBottom: '0.25rem' }}>⚡ Injects (Gold Chaos Cards)</div>
                   <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
                     Random incident twists representing real-world chaos (executive overrules, log purges, legal alerts).
                   </div>

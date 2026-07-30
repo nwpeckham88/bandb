@@ -11,7 +11,13 @@ export default function AiStatusIndicator({ mode = 'EVALUATING', config }) {
     return () => clearInterval(timer);
   }, []);
 
-  const providerName = config?.provider === 'openai' ? 'OPENAI API' : 'LOCAL OLLAMA';
+  const providerName = config?.provider === 'ollama'
+    ? 'LOCAL OLLAMA'
+    : (config?.openaiUrl || '').includes('groq')
+    ? 'GROQ API'
+    : (config?.openaiUrl || '').includes('openrouter')
+    ? 'OPENROUTER API'
+    : 'OPENAI API';
   const modelName = config?.provider === 'openai'
     ? config?.openaiModel || 'gpt-4o'
     : config?.ollamaModel || 'hf.co/OBLITERATUS/Gemma-4-12B-OBLITERATED:Q4_K_M';

@@ -324,7 +324,6 @@ function extractJsonFromText(text) {
   return null;
 }
 
-/**
 // Recent Initial Card IDs history tracker (stored in localStorage)
 function getRecentInitialCardIds() {
   try {

@@ -178,7 +178,7 @@ export default function CardItem({
             <button
               className="cyber-button"
               disabled
-              title="Select an incident card (threat vector) above to play a card"
+              title="Select a threat vector above to play a procedure card"
               style={{
                 width: '100%',
                 justifyContent: 'center',
@@ -194,7 +194,7 @@ export default function CardItem({
               }}
             >
               <Lock size={12} />
-              <span>SELECT INCIDENT CARD</span>
+              <span>SELECT THREAT VECTOR</span>
             </button>
           ) : isBonusBlocked ? (
             <button

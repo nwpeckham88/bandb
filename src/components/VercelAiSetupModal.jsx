@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Cpu, Globe, CheckCircle2, Shield, Sparkles, Key, Server, Terminal, AlertTriangle } from 'lucide-react';
+import { Cpu, Globe, CheckCircle2, Sparkles, AlertTriangle } from 'lucide-react';
 import { isVercelDeployment } from '../engine/aiService.js';
 
 export default function VercelAiSetupModal({
@@ -21,7 +21,7 @@ export default function VercelAiSetupModal({
     try {
       const u = new URL(urlStr || 'http://localhost:11434');
       return { host: `${u.protocol}//${u.hostname}`, port: u.port || '11434' };
-    } catch (e) {
+    } catch {
       return { host: 'http://localhost', port: '11434' };
     }
   };

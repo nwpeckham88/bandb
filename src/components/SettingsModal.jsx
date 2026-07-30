@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Cpu, Globe, CheckCircle2, AlertCircle, RefreshCw, X, Sparkles } from 'lucide-react';
+import { Settings, Cpu, Globe, CheckCircle2, AlertCircle, RefreshCw, X } from 'lucide-react';
 import { fetchOllamaModels, testConnection, isVercelDeployment } from '../engine/aiService.js';
 
 export default function SettingsModal({

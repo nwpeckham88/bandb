@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Settings, RotateCcw, Cpu, CheckCircle2, AlertCircle, HelpCircle, Home, Trophy, AlertTriangle, FileText } from 'lucide-react';
+import { Shield, Settings, RotateCcw, Cpu, CheckCircle2, AlertCircle, HelpCircle, Home, Trophy, AlertTriangle } from 'lucide-react';
 
 export default function Navbar({
   config,
@@ -42,7 +42,7 @@ export default function Navbar({
             BACKDOORS <span className="text-cyan-glow">&</span> BREACHES
           </h1>
           <p style={{ fontSize: '0.62rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-            AI INCIDENT MASTER DM
+            AI INCIDENT MASTER
           </p>
         </div>
       </div>
@@ -72,7 +72,7 @@ export default function Navbar({
         {/* AI Provider Status */}
         <div
           onClick={onOpenSettings}
-          title="Click to configure AI DM settings"
+          title="Click to configure AI IM settings"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -88,7 +88,13 @@ export default function Navbar({
         >
           <Cpu size={14} color={connectionStatus.connected ? 'var(--neon-green)' : 'var(--neon-red)'} />
           <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>
-            {config.provider === 'ollama' ? 'OLLAMA' : 'OPENAI'}
+            {config.provider === 'ollama'
+              ? 'OLLAMA'
+              : (config.openaiUrl || '').includes('groq')
+              ? 'GROQ'
+              : (config.openaiUrl || '').includes('openrouter')
+              ? 'OPENROUTER'
+              : 'OPENAI'}
           </span>
           {connectionStatus.connected ? <CheckCircle2 size={12} color="var(--neon-green)" /> : <AlertCircle size={12} color="var(--neon-red)" />}
         </div>

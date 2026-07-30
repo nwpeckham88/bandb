@@ -218,7 +218,7 @@ export default function DiceRoller({
               value={customActionText || ''}
               onChange={(e) => {
                 setValidationError(false);
-                onChangeCustomAction && onChangeCustomAction(e.target.value);
+                onChangeCustomAction?.(e.target.value);
               }}
               placeholder={
                 procedureCard
@@ -248,7 +248,7 @@ export default function DiceRoller({
                 type="button"
                 onClick={() => {
                   setValidationError(false);
-                  onChangeCustomAction && onChangeCustomAction(
+                  onChangeCustomAction?.(
                     procedureCard
                       ? `Executing ${procedureCard.title} procedure against ${targetCategory ? targetCategory.toUpperCase() : 'target'} vector. Inspecting system logs and telemetry for anomalous indicators.`
                       : `Executing general IR investigation against ${targetCategory ? targetCategory.toUpperCase() : 'target'} vector. Inspecting telemetry for anomalous indicators.`
@@ -263,7 +263,7 @@ export default function DiceRoller({
                 type="button"
                 onClick={() => {
                   setValidationError(false);
-                  onChangeCustomAction && onChangeCustomAction(`Analyze SIEM authentication failure logs and Kerberos ticket requests on domain controllers.`);
+                  onChangeCustomAction?.(`Analyze SIEM authentication failure logs and Kerberos ticket requests on domain controllers.`);
                 }}
                 style={{ fontSize: '0.65rem', background: 'rgba(0, 243, 255, 0.08)', border: '1px solid rgba(0, 243, 255, 0.2)', color: 'var(--neon-cyan)', borderRadius: '4px', padding: '0.2rem 0.45rem', cursor: 'pointer' }}
               >
@@ -274,7 +274,7 @@ export default function DiceRoller({
                 type="button"
                 onClick={() => {
                   setValidationError(false);
-                  onChangeCustomAction && onChangeCustomAction(`Perform full EDR memory dump and inspect parent-child process tree on primary server.`);
+                  onChangeCustomAction?.(`Perform full EDR memory dump and inspect parent-child process tree on primary server.`);
                 }}
                 style={{ fontSize: '0.65rem', background: 'rgba(0, 255, 136, 0.08)', border: '1px solid rgba(0, 255, 136, 0.2)', color: 'var(--neon-green)', borderRadius: '4px', padding: '0.2rem 0.45rem', cursor: 'pointer' }}
               >
@@ -285,7 +285,7 @@ export default function DiceRoller({
                 type="button"
                 onClick={() => {
                   setValidationError(false);
-                  onChangeCustomAction && onChangeCustomAction(`Filter firewall PCAP and netflow telemetry for suspicious egress traffic on non-standard ports.`);
+                  onChangeCustomAction?.(`Filter firewall PCAP and netflow telemetry for suspicious egress traffic on non-standard ports.`);
                 }}
                 style={{ fontSize: '0.65rem', background: 'rgba(255, 170, 0, 0.08)', border: '1px solid rgba(255, 170, 0, 0.2)', color: 'var(--neon-amber)', borderRadius: '4px', padding: '0.2rem 0.45rem', cursor: 'pointer' }}
               >

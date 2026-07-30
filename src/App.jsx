@@ -14,7 +14,6 @@ import { CARD_TYPES } from './data/cards.js';
 import { initializeNewGame, getProcedureBonus, getInjectModifiers, getRandomInject, processProcedureCardPlay, getNextUndiscoveredCategory } from './engine/gameEngine.js';
 import {
   getDefaultConfig,
-  isVercelDeployment,
   testConnection,
   selectScenarioCardsWithAi,
   generateScenarioBrief,
@@ -82,7 +81,7 @@ export default function App() {
     if (gameState && gameState.phase === 'GAME_OVER') {
       setIsGameOverModalOpen(true);
     }
-  }, [gameState?.phase]);
+  }, [gameState]);
 
   useEffect(() => {
     localStorage.setItem('bb_ai_config', JSON.stringify(config));
@@ -409,7 +408,7 @@ export default function App() {
 
   // Derive inject modifiers for pre-roll display (outside handleRollComplete)
   const activeInjectSnap = gameState.activeInject;
-  const { rollPenalty: displayPenalty, thresholdDelta: displayThresholdDelta, blockedCategories } = getInjectModifiers(activeInjectSnap);
+  const { rollPenalty: displayPenalty, thresholdDelta: displayThresholdDelta } = getInjectModifiers(activeInjectSnap);
   const calculatedProcedureBonus = selectedProcedure
     ? getProcedureBonus(selectedProcedure, selectedTargetCategory, activeInjectSnap)
     : 0;

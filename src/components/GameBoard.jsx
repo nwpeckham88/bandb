@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import CardItem from './CardItem.jsx';
-import { CARD_TYPES, TYPE_CONFIG } from '../data/cards.js';
-import { Target, Zap, Filter, Sparkles, ShieldCheck, Play, Lock, AlertTriangle } from 'lucide-react';
+import { CARD_TYPES } from '../data/cards.js';
+import { Target, Zap, Filter, Sparkles, AlertTriangle } from 'lucide-react';
 
 export default function GameBoard({
   gameState,
@@ -102,8 +102,6 @@ export default function GameBoard({
                   isDiscovered={isDiscovered}
                   isAttackCard={true}
                   isSelected={isSelected && !isDiscovered}
-                  onMouseEnter={() => setHoveredCard(secretCard)}
-                  onMouseLeave={() => setHoveredCard(null)}
                   onSelect={() => {
                     if (!isDiscovered) {
                       onSelectTargetCategory(isSelected ? null : type);
@@ -116,7 +114,7 @@ export default function GameBoard({
         </div>
       </div>
 
-      {/* Warning banner if no incident card is selected */}
+      {/* Warning banner if no threat vector is selected */}
       {!hasSelectedIncident && (
         <div className="cyber-card" style={{
           padding: '0.55rem 0.9rem',
@@ -129,10 +127,10 @@ export default function GameBoard({
           <AlertTriangle size={20} color="var(--neon-amber)" style={{ flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: 'var(--font-header)', fontSize: '0.78rem', color: 'var(--neon-amber)', fontWeight: 800 }}>
-              NO INCIDENT CARD SELECTED
+              NO THREAT VECTOR SELECTED
             </div>
             <div style={{ fontSize: '0.74rem', color: 'var(--text-main)', marginTop: '0.1rem' }}>
-              Click an incident card (threat vector slot above) to select your target before playing a procedure card.
+              Click a threat vector slot above to select your target before playing a procedure card or rolling.
             </div>
           </div>
         </div>
