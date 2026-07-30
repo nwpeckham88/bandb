@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Cpu, Globe, CheckCircle2, Shield, Sparkles, Key, Server, Terminal, AlertTriangle } from 'lucide-react';
+import { isVercelDeployment } from '../engine/aiService.js';
 
 export default function VercelAiSetupModal({
   isOpen,
@@ -7,7 +8,8 @@ export default function VercelAiSetupModal({
   onSave,
   onClose
 }) {
-  const [providerMode, setProviderMode] = useState('cloud'); // 'cloud' | 'local'
+  const onVercel = isVercelDeployment();
+  const [providerMode, setProviderMode] = useState(() => (onVercel ? 'cloud' : 'local'));
 
   // Cloud AI state
   const [openaiUrl, setOpenaiUrl] = useState(config.openaiUrl || 'https://api.openai.com/v1');
@@ -96,25 +98,29 @@ export default function VercelAiSetupModal({
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.4rem',
-            background: 'rgba(0, 243, 255, 0.12)',
-            border: '1px solid var(--neon-cyan)',
+            background: onVercel ? 'rgba(0, 243, 255, 0.12)' : 'rgba(168, 85, 247, 0.12)',
+            border: `1px solid ${onVercel ? 'var(--neon-cyan)' : 'var(--neon-purple)'}`,
             padding: '0.25rem 0.75rem',
             borderRadius: '20px',
-            color: 'var(--neon-cyan)',
+            color: onVercel ? 'var(--neon-cyan)' : 'var(--neon-purple)',
             fontFamily: 'var(--font-header)',
             fontSize: '0.72rem',
             fontWeight: 800,
             marginBottom: '0.65rem'
           }}>
             <Sparkles size={14} />
-            <span>VERCEL HOSTED ENVIRONMENT DETECTED</span>
+            <span>{onVercel ? 'VERCEL HOSTED ENVIRONMENT DETECTED' : 'LOCAL ENVIRONMENT DETECTED'}</span>
           </div>
 
           <h2 style={{ fontFamily: 'var(--font-header)', fontSize: '1.2rem', fontWeight: 800, color: '#fff' }}>
             CONFIGURE AI INCIDENT MASTER
           </h2>
           <p style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginTop: '0.35rem', lineHeight: 1.45 }}>
-            Choose how you want to connect to AI for live incident narration. Select <strong>Cloud AI</strong> for zero-permission web playback, or <strong>Local AI (Ollama)</strong> to connect to your local machine.
+            Choose how you want to connect to AI for live incident narration.{' '}
+            {onVercel
+              ? <span><strong>Cloud AI (OpenAI API)</strong> is selected by default for live web hosting.</span>
+              : <span><strong>Local AI (Ollama)</strong> is selected by default for local execution.</span>
+            }
           </p>
         </div>
 

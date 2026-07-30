@@ -74,7 +74,7 @@ export default function App() {
   const [isGameOverModalOpen, setIsGameOverModalOpen] = useState(false);
   const [isVercelSetupOpen, setIsVercelSetupOpen] = useState(() => {
     const chosen = localStorage.getItem('bb_vercel_ai_mode_chosen');
-    return isVercelDeployment() && !chosen;
+    return !chosen;
   });
   const [isAiThinking, setIsAiThinking] = useState(false);
 
