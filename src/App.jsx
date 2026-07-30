@@ -8,11 +8,13 @@ import SettingsModal from './components/SettingsModal.jsx';
 import RulesModal from './components/RulesModal.jsx';
 import StartSplash from './components/StartSplash.jsx';
 import GameOverModal from './components/GameOverModal.jsx';
+import VercelAiSetupModal from './components/VercelAiSetupModal.jsx';
 
 import { CARD_TYPES } from './data/cards.js';
 import { initializeNewGame, getProcedureBonus, getInjectModifiers, getRandomInject, processProcedureCardPlay, getNextUndiscoveredCategory } from './engine/gameEngine.js';
 import {
-  DEFAULT_CONFIG,
+  getDefaultConfig,
+  isVercelDeployment,
   testConnection,
   selectScenarioCardsWithAi,
   generateScenarioBrief,
@@ -25,15 +27,16 @@ import {
 export default function App() {
   const [config, setConfig] = useState(() => {
     const saved = localStorage.getItem('bb_ai_config');
+    const defaultConfig = getDefaultConfig();
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        return { ...DEFAULT_CONFIG, ...parsed };
+        return { ...defaultConfig, ...parsed };
       } catch (e) {
         console.warn('Failed to parse saved config:', e);
       }
     }
-    return DEFAULT_CONFIG;
+    return defaultConfig;
   });
 
   const [savedGameData, setSavedGameData] = useState(() => {
@@ -69,6 +72,10 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [isGameOverModalOpen, setIsGameOverModalOpen] = useState(false);
+  const [isVercelSetupOpen, setIsVercelSetupOpen] = useState(() => {
+    const chosen = localStorage.getItem('bb_vercel_ai_mode_chosen');
+    return isVercelDeployment() && !chosen;
+  });
   const [isAiThinking, setIsAiThinking] = useState(false);
 
   useEffect(() => {
@@ -432,6 +439,12 @@ export default function App() {
           isOpen={isRulesOpen}
           onClose={() => setIsRulesOpen(false)}
         />
+        <VercelAiSetupModal
+          isOpen={isVercelSetupOpen}
+          config={config}
+          onSave={(newConf) => setConfig(newConf)}
+          onClose={() => setIsVercelSetupOpen(false)}
+        />
       </>
     );
   }
@@ -505,6 +518,13 @@ export default function App() {
         gameState={gameState}
         onClose={() => setIsGameOverModalOpen(false)}
         onNewGame={handleNewGame}
+      />
+
+      <VercelAiSetupModal
+        isOpen={isVercelSetupOpen}
+        config={config}
+        onSave={(newConf) => setConfig(newConf)}
+        onClose={() => setIsVercelSetupOpen(false)}
       />
 
     </div>

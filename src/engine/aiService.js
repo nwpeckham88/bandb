@@ -6,16 +6,44 @@ import {
   DEFAULT_DECK_ID
 } from '../data/cards.js';
 
-export const DEFAULT_CONFIG = {
-  provider: 'ollama', // 'ollama' | 'openai'
-  ollamaUrl: 'http://localhost:11434',
-  ollamaModel: 'hf.co/OBLITERATUS/Gemma-4-12B-OBLITERATED:Q4_K_M',
-  numGpu: 99, // 99 = force max/all layers onto GPU VRAM
-  openaiUrl: 'https://api.openai.com/v1',
-  openaiKey: '',
-  openaiModel: 'gpt-4o',
-  temperature: 0.7
-};
+/**
+ * Detect if the app is currently running on Vercel deployment (or a remote web environment).
+ */
+export function isVercelDeployment() {
+  if (typeof window === 'undefined') return false;
+  const host = (window.location.hostname || '').toLowerCase();
+  
+  if (host.endsWith('.vercel.app') || host.includes('vercel')) {
+    return true;
+  }
+  
+  if (import.meta.env?.VITE_VERCEL || import.meta.env?.VERCEL) {
+    return true;
+  }
+
+  // Any non-localhost, non-loopback deployment host
+  const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host.endsWith('.local');
+  const isPrivateIp = host.startsWith('192.168.') || host.startsWith('10.') || host.startsWith('172.16.');
+
+  return !isLocalHost && !isPrivateIp;
+}
+
+export function getDefaultConfig() {
+  const onVercel = isVercelDeployment();
+  return {
+    provider: onVercel ? 'openai' : 'ollama',
+    ollamaUrl: 'http://localhost:11434',
+    ollamaModel: 'hf.co/OBLITERATUS/Gemma-4-12B-OBLITERATED:Q4_K_M',
+    numGpu: 99, // 99 = force max/all layers onto GPU VRAM
+    openaiUrl: 'https://api.openai.com/v1',
+    openaiKey: '',
+    openaiModel: 'gpt-4o',
+    temperature: 0.7,
+    vercelModeChosen: false
+  };
+}
+
+export const DEFAULT_CONFIG = getDefaultConfig();
 
 /**
  * CORE BASE DM SYSTEM PROMPT & SECRECY MANDATES

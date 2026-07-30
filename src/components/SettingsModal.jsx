@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Cpu, Globe, CheckCircle2, AlertCircle, RefreshCw, X } from 'lucide-react';
-import { fetchOllamaModels, testConnection } from '../engine/aiService.js';
+import { Settings, Cpu, Globe, CheckCircle2, AlertCircle, RefreshCw, X, Sparkles } from 'lucide-react';
+import { fetchOllamaModels, testConnection, isVercelDeployment } from '../engine/aiService.js';
 
 export default function SettingsModal({
   isOpen,
@@ -42,6 +42,16 @@ export default function SettingsModal({
     onClose();
   };
 
+  const handlePreset = (presetType) => {
+    if (presetType === 'openai') {
+      setFormData(prev => ({ ...prev, openaiUrl: 'https://api.openai.com/v1', openaiModel: 'gpt-4o' }));
+    } else if (presetType === 'groq') {
+      setFormData(prev => ({ ...prev, openaiUrl: 'https://api.groq.com/openai/v1', openaiModel: 'llama-3.3-70b-versatile' }));
+    } else if (presetType === 'openrouter') {
+      setFormData(prev => ({ ...prev, openaiUrl: 'https://openrouter.ai/api/v1', openaiModel: 'openai/gpt-4o-mini' }));
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -70,11 +80,29 @@ export default function SettingsModal({
         </button>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1.25rem' }}>
-          <Settings size={22} color="var(--neon-cyan)" />
-          <h2 style={{ fontFamily: 'var(--font-header)', fontSize: '1.1rem', fontWeight: 700 }}>
-            AI INCIDENT MASTER // PROVIDER CONFIG
-          </h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <Settings size={22} color="var(--neon-cyan)" />
+            <h2 style={{ fontFamily: 'var(--font-header)', fontSize: '1.1rem', fontWeight: 700 }}>
+              AI INCIDENT MASTER // PROVIDER CONFIG
+            </h2>
+          </div>
+
+          {isVercelDeployment() && (
+            <span style={{
+              background: 'rgba(0, 243, 255, 0.12)',
+              border: '1px solid var(--neon-cyan)',
+              color: 'var(--neon-cyan)',
+              fontSize: '0.65rem',
+              fontFamily: 'var(--font-mono)',
+              fontWeight: 700,
+              padding: '0.2rem 0.5rem',
+              borderRadius: '4px',
+              marginRight: '2rem'
+            }}>
+              VERCEL HOSTED
+            </span>
+          )}
         </div>
 
         {/* Provider Toggle Buttons */}
@@ -215,6 +243,37 @@ export default function SettingsModal({
         {/* OpenAI Settings Form */}
         {formData.provider === 'openai' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            
+            {/* Quick Provider Presets */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '0.72rem', color: 'var(--neon-cyan)', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+                QUICK PROVIDER PRESETS:
+              </span>
+              <div style={{ display: 'flex', gap: '0.35rem' }}>
+                <button
+                  type="button"
+                  onClick={() => handlePreset('openai')}
+                  style={{ fontSize: '0.68rem', background: 'rgba(0, 243, 255, 0.12)', border: '1px solid var(--neon-cyan)', color: 'var(--neon-cyan)', borderRadius: '4px', padding: '0.2rem 0.45rem', cursor: 'pointer', fontWeight: 700 }}
+                >
+                  OpenAI
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePreset('groq')}
+                  style={{ fontSize: '0.68rem', background: 'rgba(0, 255, 136, 0.12)', border: '1px solid var(--neon-green)', color: 'var(--neon-green)', borderRadius: '4px', padding: '0.2rem 0.45rem', cursor: 'pointer', fontWeight: 700 }}
+                >
+                  Groq
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handlePreset('openrouter')}
+                  style={{ fontSize: '0.68rem', background: 'rgba(168, 85, 247, 0.12)', border: '1px solid var(--neon-purple)', color: 'var(--neon-purple)', borderRadius: '4px', padding: '0.2rem 0.45rem', cursor: 'pointer', fontWeight: 700 }}
+                >
+                  OpenRouter
+                </button>
+              </div>
+            </div>
+
             <div>
               <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.35rem', fontFamily: 'var(--font-mono)' }}>
                 API BASE URL (OpenAI, OpenRouter, Groq, LM Studio)
