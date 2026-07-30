@@ -297,6 +297,31 @@ function extractJsonFromText(text) {
 }
 
 /**
+// Recent Initial Card IDs history tracker (stored in localStorage)
+function getRecentInitialCardIds() {
+  try {
+    const saved = localStorage.getItem('bb_recent_initial_ids');
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch (e) {
+    console.warn('Failed to parse recent initial card history:', e);
+  }
+  return [];
+}
+
+function recordInitialCardId(cardId) {
+  if (!cardId) return;
+  try {
+    const recent = getRecentInitialCardIds().filter(id => id !== cardId);
+    recent.unshift(cardId);
+    localStorage.setItem('bb_recent_initial_ids', JSON.stringify(recent.slice(0, 5)));
+  } catch (e) {
+    console.warn('Failed to save recent initial card history:', e);
+  }
+}
+
+/**
  * AI Scenario Card Selection — AI selects secret cards for Initial Compromise, Pivot, Persistence, and C2
  * matching the user's custom prompt/theme to construct a realistic attack chain.
  */
@@ -314,34 +339,45 @@ export async function selectScenarioCardsWithAi(customPrompt = '', config = DEFA
   const persistenceMap = new Map(persistenceList.map(c => [c.id, c]));
   const c2Map = new Map(c2List.map(c => [c.id, c]));
 
+  const recentInitialIds = getRecentInitialCardIds();
+  const isWebPrompt = Boolean(customPrompt && /web|sql|http|dmz|site|xss|portal/i.test(customPrompt));
+
   // Heuristic fallback selector for offline mode or fallback
   const getFallbackCards = (promptText) => {
     const p = (promptText || '').toLowerCase();
     
     // Initial Compromise card matching
-    let initialCard = initialList[0];
+    let initialCard;
     if (p.includes('sql') || p.includes('web') || p.includes('injection') || p.includes('app') || p.includes('http') || p.includes('site') || p.includes('portal') || p.includes('xss') || p.includes('api')) {
-      initialCard = initialMap.get('init-3') || initialCard; // Exploited Public-Facing Web App
+      initialCard = initialMap.get('init-3'); // Exploited Public-Facing Web App
     } else if (p.includes('spray') || p.includes('credential') || p.includes('stuffing') || p.includes('login') || p.includes('password') || p.includes('brute')) {
-      initialCard = initialMap.get('init-2') || initialCard; // Password Spray
+      initialCard = initialMap.get('init-2'); // Password Spray
     } else if (p.includes('usb') || p.includes('thumb') || p.includes('drive') || p.includes('physical') || p.includes('parking')) {
-      initialCard = initialMap.get('init-4') || initialCard; // Malicious USB
+      initialCard = initialMap.get('init-4'); // Malicious USB
     } else if (p.includes('supply') || p.includes('vendor') || p.includes('update') || p.includes('cert') || p.includes('rmm')) {
-      initialCard = initialMap.get('init-5') || initialCard; // Supply Chain
+      initialCard = initialMap.get('init-5'); // Supply Chain
     } else if (p.includes('cloud') || p.includes('aws') || p.includes('azure') || p.includes('s3') || p.includes('key') || p.includes('iam') || p.includes('token')) {
-      initialCard = initialMap.get('init-6') || initialCard; // External Cloud Access
+      initialCard = initialMap.get('init-6'); // External Cloud Access
     } else if (p.includes('insider') || p.includes('employee') || p.includes('disgruntled') || p.includes('exfiltration')) {
-      initialCard = initialMap.get('init-7') || initialCard; // Insider Threat
+      initialCard = initialMap.get('init-7'); // Insider Threat
     } else if (p.includes('vishing') || p.includes('phone') || p.includes('voice') || p.includes('helpdesk') || p.includes('smishing') || p.includes('call')) {
-      initialCard = initialMap.get('init-8') || initialCard; // Social Engineering
+      initialCard = initialMap.get('init-8'); // Social Engineering
     } else if (p.includes('byod') || p.includes('wifi') || p.includes('laptop') || p.includes('wireless') || p.includes('personal')) {
-      initialCard = initialMap.get('init-9') || initialCard; // BYOD
+      initialCard = initialMap.get('init-9'); // BYOD
     } else if (p.includes('vpn') || p.includes('gateway') || p.includes('rdp') || p.includes('ssl') || p.includes('perimeter')) {
-      initialCard = initialMap.get('init-10') || initialCard; // Exploitable Gateway
+      initialCard = initialMap.get('init-10'); // Exploitable Gateway
     } else if (p.includes('phish') || p.includes('email') || p.includes('macro') || p.includes('pdf') || p.includes('doc')) {
-      initialCard = initialMap.get('init-1') || initialCard; // Phishing
-    } else {
-      initialCard = initialList[Math.floor(Math.random() * initialList.length)];
+      initialCard = initialMap.get('init-1'); // Phishing
+    }
+
+    if (!initialCard) {
+      // Pick a random initial card that is NOT init-3 (unless explicitly requested) and not recently played
+      const candidates = initialList.filter(c => c.id !== 'init-3' && !recentInitialIds.includes(c.id));
+      const pool = candidates.length > 0
+        ? candidates
+        : initialList.filter(c => c.id !== 'init-3');
+      const finalPool = pool.length > 0 ? pool : initialList;
+      initialCard = finalPool[Math.floor(Math.random() * finalPool.length)];
     }
 
     // Cohesive Pivot matching
@@ -351,7 +387,8 @@ export async function selectScenarioCardsWithAi(customPrompt = '', config = DEFA
     } else if (p.includes('active directory') || p.includes('domain') || p.includes('kerberos')) {
       pivotCard = pivotMap.get('piv-1') || pivotList[0];
     } else {
-      pivotCard = pivotList[Math.floor(Math.random() * pivotList.length)];
+      const candidates = pivotList.filter(c => c.id !== 'piv-2');
+      pivotCard = (candidates.length > 0 ? candidates : pivotList)[Math.floor(Math.random() * (candidates.length > 0 ? candidates.length : pivotList.length))];
     }
 
     // Cohesive Persistence matching
@@ -359,7 +396,8 @@ export async function selectScenarioCardsWithAi(customPrompt = '', config = DEFA
     if (initialCard?.id === 'init-3' || p.includes('web')) {
       persistenceCard = persistenceMap.get('pers-2') || persistenceList[0]; // Web Shell
     } else {
-      persistenceCard = persistenceList[Math.floor(Math.random() * persistenceList.length)];
+      const candidates = persistenceList.filter(c => c.id !== 'pers-2');
+      persistenceCard = (candidates.length > 0 ? candidates : persistenceList)[Math.floor(Math.random() * (candidates.length > 0 ? candidates.length : persistenceList.length))];
     }
 
     // Cohesive C2 matching
@@ -388,8 +426,10 @@ export async function selectScenarioCardsWithAi(customPrompt = '', config = DEFA
   const systemPrompt = `You are a Cyber Threat Intelligence Architect designing an incident response tabletop scenario.
 Your task is to select 4 secret cards (Initial Compromise, Pivot & Escalate, Persistence, and C2 & Exfiltration) to build a realistic, technically plausible attack scenario.
 
-CRITICAL INSTRUCTION:
-${customPrompt ? `The operator explicitly requested this custom scenario context: "${customPrompt}". You MUST choose cards (especially the Initial Compromise card) that best fit this requirement (e.g. for SQL injection or web application exploit, select 'init-3' Exploited Public-Facing Web App).` : 'Select cards that create a realistic, connected attack chain.'}
+CRITICAL INSTRUCTIONS FOR VARIETY AND REPLAYABILITY:
+1. ${customPrompt ? `The operator requested custom context: "${customPrompt}". Choose the card that best fits this theme.` : 'Select cards that build a diverse, realistic attack chain.'}
+2. ${!isWebPrompt ? 'DO NOT select "init-3" (Exploited Public-Facing Web App / DMZ Web Server) unless the prompt explicitly requests web application attacks. Ensure you select a fresh initial vector (e.g. Phishing, Password Spray, Malicious USB, Cloud Access, Insider Threat, Vishing, BYOD, or VPN Gateway).' : ''}
+${recentInitialIds.length > 0 ? `3. Avoid re-using these recently played initial cards if possible: ${recentInitialIds.join(', ')}.` : ''}
 
 Return ONLY valid JSON in this format:
 {
@@ -413,31 +453,50 @@ ${persistenceBriefs}
 C2 & EXFILTRATION CARDS:
 ${c2Briefs}
 
-${customPrompt ? `OPERATOR CUSTOM PROMPT: "${customPrompt}"` : 'Design a realistic attack scenario.'}
+${customPrompt ? `OPERATOR CUSTOM PROMPT: "${customPrompt}"` : 'Design a fresh, realistic attack scenario.'}
 
 Respond ONLY with JSON containing the 4 chosen card IDs.`;
+
+  let selectedResult = null;
 
   try {
     const rawAiOutput = await callAi(systemPrompt, userPrompt, config);
     const parsedJson = extractJsonFromText(rawAiOutput);
 
     if (parsedJson && parsedJson.initial && parsedJson.pivot && parsedJson.persistence && parsedJson.c2) {
+      let chosenInitialId = parsedJson.initial;
+      // Safeguard: if AI selected init-3 when not requested, swap with a diverse vector
+      if (!isWebPrompt && chosenInitialId === 'init-3') {
+        const altPool = initialList.filter(c => c.id !== 'init-3' && !recentInitialIds.includes(c.id));
+        const chosenAlt = (altPool.length > 0 ? altPool : initialList.filter(c => c.id !== 'init-3'))[0];
+        if (chosenAlt) chosenInitialId = chosenAlt.id;
+      }
+
       const selected = {
-        [CARD_TYPES.INITIAL]: initialMap.get(parsedJson.initial),
+        [CARD_TYPES.INITIAL]: initialMap.get(chosenInitialId),
         [CARD_TYPES.PIVOT]: pivotMap.get(parsedJson.pivot),
         [CARD_TYPES.PERSISTENCE]: persistenceMap.get(parsedJson.persistence),
         [CARD_TYPES.C2]: c2Map.get(parsedJson.c2)
       };
 
       if (selected.initial && selected.pivot && selected.persistence && selected.c2) {
-        return selected;
+        selectedResult = selected;
       }
     }
   } catch (err) {
     console.warn('AI card selection failed or provider offline, using heuristic fallback:', err);
   }
 
-  return getFallbackCards(customPrompt);
+  if (!selectedResult) {
+    selectedResult = getFallbackCards(customPrompt);
+  }
+
+  // Record initial card ID so subsequent games continue to vary initial attack vectors
+  if (selectedResult && selectedResult[CARD_TYPES.INITIAL]) {
+    recordInitialCardId(selectedResult[CARD_TYPES.INITIAL].id);
+  }
+
+  return selectedResult;
 }
 
 /**
@@ -446,9 +505,11 @@ Respond ONLY with JSON containing the 4 chosen card IDs.`;
 export async function generateScenarioBrief(secretCards, config = DEFAULT_CONFIG, customPrompt = '') {
   const initialCard = secretCards.initial;
   const attackSurface = initialCard?.attackVector || 'External Perimeter';
+  const initialTitle = initialCard?.title || 'Unknown Vector';
 
   const prompt = `CLASSIFIED INCIDENT CONTEXT (IM EYES ONLY — STRICT CONFIDENTIALITY):
 PRIMARY ENTRY SURFACE: ${attackSurface}
+INITIAL ATTACK TYPE: ${initialTitle}
 
 ${customPrompt ? `
 CRITICAL OPERATOR REQUIREMENT / THEME:
@@ -458,11 +519,12 @@ YOUR TASK — OPENING INCIDENT BRIEF:
 Deliver the opening situation report for this IR engagement.
 
 STRICT NO-LEAK DIRECTIVE:
-1. The incident briefing MUST be based primarily on the Initial Compromise entry surface (${attackSurface}).
-2. ABSOLUTELY DO NOT REVEAL ANY EXTRA INFORMATION:
-   - Do NOT name or reveal the secret card title, card ID, CVE number, specific malware family, or exact technique name.
+1. The incident briefing MUST be based strictly on the designated Initial Compromise entry surface (${attackSurface}) and alert telemetry related to ${initialTitle}.
+2. Do NOT default to a web application or DMZ web server scenario unless the primary entry surface (${attackSurface}) is specifically a web application.
+3. ABSOLUTELY DO NOT REVEAL ANY EXTRA INFORMATION:
+   - Do NOT name the exact secret card title (${initialTitle}), card ID, CVE number, specific malware family, or exact technique name.
    - Do NOT mention or reveal any information about subsequent attack stages (Pivot & Escalate, Persistence, or C2 & Exfiltration). Those remain 100% secret.
-3. Describe ONLY high-level, realistic initial operational telemetry (e.g. unusual perimeter traffic alerts, helpdesk reports of login anomalies, or SIEM hits on the entry surface). Give enough operational context for the Defenders to investigate without giving away the exact answer.
+4. Describe ONLY high-level, realistic initial operational telemetry matching ${attackSurface} (e.g. email gateway flags for phishing, authentication spikes for password spray, USB driver events for physical drops, cloud IAM API anomalies, RDP connection spikes, or IT helpdesk ticket alerts).
 
 Format:
 [INCIDENT BRIEF — INITIAL ALERT]
@@ -477,7 +539,7 @@ IMPORTANT: Speak as the Incident Master. Do not mention cards, dice, or simulati
   } catch (err) {
     console.error('Failed to generate scenario brief via AI:', err);
     // Fallback: build a brief without revealing secret titles or extra info
-    return `⚠️ [AI PROVIDER UNREACHABLE — ${config.provider === 'ollama' ? config.ollamaUrl : 'OpenAI'}]: ${err.message}\nConfigure your AI provider in Settings or ensure Ollama is running.\n\n---\n\n[INCIDENT BRIEF — INITIAL ALERT]\n\nAt 07:23 this morning, the SOC flagged anomalous activity on perimeter systems (${attackSurface}). Initial SIEM telemetry indicates patterns of unauthorized activity on primary systems. The affected environment spans internal subnets and key infrastructure nodes.${customPrompt ? `\n\nOperator context: ${customPrompt}` : ''}\n\nAll IR leads: stand by for initial vector assignments. Begin investigation with your 5 Procedure cards against the Initial Compromise surface. The clock is running (10 turns max).`;
+    return `⚠️ [AI PROVIDER UNREACHABLE — ${config.provider === 'ollama' ? config.ollamaUrl : 'OpenAI'}]: ${err.message}\nConfigure your AI provider in Settings or ensure Ollama is running.\n\n---\n\n[INCIDENT BRIEF — INITIAL ALERT]\n\nAt 07:23 this morning, the SOC flagged anomalous activity on primary systems (${attackSurface}). Initial SIEM telemetry indicates patterns of unauthorized activity on primary entry points.${customPrompt ? `\n\nOperator context: ${customPrompt}` : ''}\n\nAll IR leads: stand by for initial vector assignments. Begin investigation with your 5 Procedure cards against the Initial Compromise surface. The clock is running (10 turns max).`;
   }
 }
 
