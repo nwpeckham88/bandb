@@ -463,7 +463,7 @@ export default function App() {
         onOpenDebrief={() => setIsGameOverModalOpen(true)}
       />
 
-      <main style={{ flex: 1, padding: '0.85rem', display: 'grid', gridTemplateColumns: '1fr 380px', gap: '0.85rem', overflow: 'hidden' }}>
+      <main style={{ flex: 1, padding: '0.85rem', display: 'grid', gridTemplateColumns: '1fr 480px', gap: '0.85rem', overflow: 'hidden' }}>
         
         <div style={{ height: '100%', overflow: 'hidden' }}>
           <GameBoard

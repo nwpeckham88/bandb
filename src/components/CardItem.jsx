@@ -30,7 +30,7 @@ export default function CardItem({
   const IconComponent = ICON_MAP[typeConfig.icon] || ShieldAlert;
   const hasBonus = isProcedureCard && hasSelectedIncident && !isBonusBlocked && targetCategory && card.bonusTargets?.includes(targetCategory);
 
-  // Attack card face-down render
+  // Attack card face-down render (Unrevealed Threat Vector Slot)
   if (isAttackCard && !isDiscovered) {
     return (
       <div
@@ -39,42 +39,60 @@ export default function CardItem({
         onMouseLeave={() => onMouseLeave && onMouseLeave()}
         className={`cyber-card cyber-card-interactive ${isSelected ? 'cyber-card-glow' : ''}`}
         style={{
-          minHeight: '160px',
+          minHeight: '210px',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '0.85rem 0.65rem',
-          textAlign: 'center',
-          background: isSelected ? 'rgba(0, 243, 255, 0.12)' : 'linear-gradient(145deg, rgba(15, 21, 35, 0.95), rgba(8, 11, 17, 0.95))',
+          justifyContent: 'space-between',
+          padding: '0.9rem',
+          textAlign: 'left',
+          background: isSelected
+            ? 'linear-gradient(145deg, rgba(0, 243, 255, 0.14), rgba(8, 11, 17, 0.95))'
+            : 'linear-gradient(145deg, rgba(15, 21, 35, 0.95), rgba(8, 11, 17, 0.95))',
           borderColor: isSelected ? 'var(--neon-cyan)' : typeConfig.borderColor,
           borderStyle: isSelected ? 'solid' : 'dashed',
           borderWidth: isSelected ? '1.5px' : '1px',
+          boxShadow: isSelected ? '0 0 16px rgba(0, 243, 255, 0.3)' : 'none',
           cursor: 'pointer'
         }}
       >
-        <div style={{
-          background: typeConfig.bgColor,
-          padding: '0.5rem',
-          borderRadius: '50%',
-          border: `1.5px solid ${typeConfig.color}`,
-          marginBottom: '0.5rem',
-          boxShadow: isSelected ? `0 0 12px ${typeConfig.color}` : 'none'
-        }}>
-          <Lock size={20} color={typeConfig.color} />
-        </div>
-        
-        <div className="card-badge" style={{ background: typeConfig.bgColor, color: typeConfig.color, border: `1px solid ${typeConfig.color}`, marginBottom: '0.35rem', fontSize: '0.68rem' }}>
-          {typeConfig.name}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.45rem' }}>
+            <div className="card-badge" style={{ background: typeConfig.bgColor, color: typeConfig.color, border: `1px solid ${typeConfig.color}`, fontSize: '0.65rem' }}>
+              {typeConfig.badge}
+            </div>
+            <Lock size={15} color={typeConfig.color} />
+          </div>
+
+          <div style={{ fontSize: '0.68rem', fontFamily: 'var(--font-mono)', color: 'var(--neon-cyan)', fontWeight: 700, marginBottom: '0.35rem' }}>
+            SURFACE: {card?.attackVector || typeConfig.name.toUpperCase()}
+          </div>
+
+          <h3 style={{ fontFamily: 'var(--font-header)', fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.35rem' }}>
+            UNREVEALED THREAT
+          </h3>
+
+          <p style={{ fontSize: '0.73rem', color: 'var(--text-muted)', lineHeight: 1.35, wordBreak: 'break-word' }}>
+            Forensic telemetry unrevealed. Target this vector with a procedure card or d20 roll (11+ required).
+          </p>
         </div>
 
-        <p style={{ fontSize: '0.72rem', color: 'var(--text-main)', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
-          UNREVEALED THREAT
-        </p>
-        <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-          Click to Target (d20)
-        </p>
+        <div style={{ marginTop: '0.5rem' }}>
+          <button
+            className={`cyber-button ${isSelected ? 'cyber-button-success' : 'cyber-button-primary'}`}
+            style={{
+              width: '100%',
+              justifyContent: 'center',
+              padding: '0.35rem 0.5rem',
+              fontSize: '0.7rem',
+              fontWeight: 800,
+              background: isSelected ? 'var(--neon-cyan)' : undefined,
+              color: isSelected ? '#080b11' : undefined
+            }}
+          >
+            {isSelected ? '🎯 TARGETING VECTOR' : 'SELECT TARGET'}
+          </button>
+        </div>
       </div>
     );
   }
@@ -87,7 +105,7 @@ export default function CardItem({
       onMouseLeave={() => onMouseLeave && onMouseLeave()}
       className={`cyber-card cyber-card-interactive ${isSelected ? 'cyber-card-glow' : ''}`}
       style={{
-        minHeight: '160px',
+        minHeight: isAttackCard ? '210px' : '190px',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
@@ -125,16 +143,33 @@ export default function CardItem({
           </h3>
         </div>
 
-        <p style={{ fontSize: '0.76rem', color: '#e2e8f0', lineHeight: 1.35, flex: 1, wordBreak: 'break-word' }}>
+        <p style={{ fontSize: '0.75rem', color: '#e2e8f0', lineHeight: 1.35, flex: 1, wordBreak: 'break-word' }}>
           {card.description}
         </p>
       </div>
 
       {/* Footer / Action */}
       <div style={{ marginTop: '0.45rem' }}>
-        {isAttackCard && card.cve && (
-          <div style={{ fontSize: '0.68rem', color: 'var(--neon-red)', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
-            REF: {card.cve}
+        {isAttackCard && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            {card.cve && (
+              <div style={{ fontSize: '0.68rem', color: 'var(--neon-red)', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+                REF: {card.cve}
+              </div>
+            )}
+            <div style={{
+              fontSize: '0.68rem',
+              color: 'var(--neon-green)',
+              fontFamily: 'var(--font-mono)',
+              fontWeight: 800,
+              background: 'rgba(0, 255, 136, 0.1)',
+              border: '1px solid var(--neon-green)',
+              borderRadius: '4px',
+              padding: '0.25rem 0.4rem',
+              textAlign: 'center'
+            }}>
+              🛡️ VECTOR DISCOVERED &amp; SECURED
+            </div>
           </div>
         )}
 
